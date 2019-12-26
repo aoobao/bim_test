@@ -12,18 +12,27 @@ export default {
     }
   },
   methods: {
+
+    getWarnFloorList () {
+      let list = []
+      for (let i = 0; i < floorList.length; i++) {
+        const floor = floorList[i];
+        if (floor.floorName !== 'ground' && floor.floorName !== '9F') {
+          let z = Math.random()
+          if (z < 0.2) {
+            list.push(floor)
+          }
+        }
+      }
+      this.warnFloor = list
+      this._warn_time_index = setTimeout(() => {
+        this.getWarnFloorList()
+      }, 5000);
+    },
+
     // 组件初始化方法
     init () {
-      // 模拟报警楼层.
-      setTimeout(() => {
-        this.warnFloor = [{
-          meshName: 'node_3f_-4644',
-          floorName: '3F'
-        }, {
-          meshName: 'node_6f_-4650',
-          floorName: '6F'
-        }]
-      }, 3000);
+
 
       let func = gltf => {
         let mesh = gltf.scene
@@ -33,9 +42,8 @@ export default {
         this.$mesh.traverse(obj => {
           // console.log(obj)
           if (obj.type === 'Mesh') {
-            if (!this.$alarmMaterial) {
-              this.$alarmMaterial = obj.material.clone()
-              this.$alarmMaterial.color.setHex(0xff0000)
+            if (!this.$defaultMaterial) {
+              this.$defaultMaterial = obj.material.clone()
             }
 
             let data = obj.userData
@@ -64,6 +72,8 @@ export default {
         let controls = this.getGlobalObject('orbitControls')
         controls.reset(true)
 
+        // 模拟报警楼层.
+        this.getWarnFloorList()
 
 
         this.$emit('init', gltf)
@@ -98,11 +108,11 @@ export default {
 
           let data = floor.userData
           let opacity = data.opacity
-          let step = data.isSub ? -0.05 : 0.05
+          let step = data.isSub ? -0.02 : 0.02
           opacity += step
 
-          if (opacity <= 0) {
-            opacity = 0
+          if (opacity <= 0.5) {
+            opacity = 0.5
             data.isSub = false
           } else if (opacity >= 1) {
             opacity = 1
@@ -134,7 +144,10 @@ export default {
           }
         }
       })
-      if (floor) floor = floor.clone()
+      if (floor) {
+        floor = floor.clone()
+        floor.material = this.$defaultMaterial
+      }
       return floor
     },
 
@@ -187,15 +200,6 @@ export default {
       controls.target = new THREE.Vector3(0, 0, 0)
       controls.update()
     },
-    // showAllMesh (obj) {
-    //   obj.visible = true
-    //   if (obj.children.length > 0) {
-    //     for (let i = 0; i < obj.children.length; i++) {
-    //       const object = obj.children[i];
-    //       this.showAllMesh(object)
-    //     }
-    //   }
-    // },
     showMesh (object, floorItem, showOnly = false) {
       if (object.type === 'Mesh') {
         let name = object.name
@@ -236,8 +240,23 @@ export default {
       }
       return item
     },
+    destroyMaterial () {
+      if (this.$alarmFloorList && this.$alarmFloorList.length > 0) {
+        this.$alarmFloorList.map(mesh => {
+          let alarmMaterial = mesh.material
+          mesh.material = this.$defaultMaterial
+          alarmMaterial.dispose()
+        })
+        this.$alarmFloorList = null
+      }
+    },
     // 组件销毁方法.
     destroy () {
+      if (this._warn_time_index) {
+        clearTimeout(this._warn_time_index)
+        this._warn_time_index = null
+      }
+      this.destroyMaterial()
       let selectManager = this.global.$selectManager
       selectManager.clear()
     }
@@ -245,13 +264,9 @@ export default {
   watch: {
     warnFloor (list) {
       // 复原
-      this.$mesh.traverse(mesh => {
-        if (mesh.isMesh) {
-          let data = mesh.userData
-          mesh.material.color.setHex(data.defaultColor)
-          mesh.material.opacity = 1
-        }
-      })
+      this.destroyMaterial()
+
+      if (!this.$mesh) return
 
       if (list.length > 0) {
         let d = new Set(list.map(t => t.meshName))
@@ -263,12 +278,13 @@ export default {
 
             if (d.has(name)) {
               if (data.opacity == undefined) {
-                data.opacity = Math.random()  // 不透明度
+                data.opacity = 0.5 + Math.random() * 0.5  // 不透明度
                 data.isSub = true
               }
               // mesh.material.color.setHex(0xff00000)
-              mesh.material = this.$alarmMaterial.clone()
+              mesh.material = this.$defaultMaterial.clone()
               mesh.material.transparent = true
+              mesh.material.color.setHex(0xff0000)
 
               alarmList.push(mesh)
             }
@@ -276,8 +292,6 @@ export default {
         })
 
         this.$alarmFloorList = alarmList
-      } else {
-        this.$alarmFloorList = null
       }
     }
   }
