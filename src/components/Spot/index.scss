@@ -1,0 +1,27 @@
+.__base_element_body {
+  .__spot_container {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    // background-color: red;
+    background-image: url('./device.png');
+    background-size: 100% 100%;
+    border-radius: 50%;
+
+    &.warning {
+      animation: warning 0.5s linear 0s infinite alternate;
+    }
+
+    @keyframes warning {
+      from {
+        box-shadow: 0 0 0 0 yellow;
+        background-color: rgba($color: yellow, $alpha: 0.5);
+      }
+
+      to {
+        box-shadow: 0 0 15px 10px red;
+        background-color: rgba($color: red, $alpha: 0.8);
+      }
+    }
+  }
+}
