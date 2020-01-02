@@ -13,9 +13,9 @@ export function removeRender(func) {
   }
 }
 
-export function updateRender() {
+export function updateRender(delta) {
   for (let i = 0; i < renders.length; i++) {
     const render = renders[i];
-    render()
+    render(delta)
   }
 }

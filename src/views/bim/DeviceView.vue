@@ -1,7 +1,7 @@
 <script>
 import register from '@/components/mixins/register'
-import MTLLoader from '@/assets/three-plugin/loaders/MTLLoader'
-import OBJLoader from '@/assets/three-plugin/loaders/OBJLoader'
+import { MTLLoader } from '@/assets/three-plugin/loaders/MTLLoader'
+import { OBJLoader } from '@/assets/three-plugin/loaders/OBJLoader'
 export default {
   mixins: [register],
   data () {

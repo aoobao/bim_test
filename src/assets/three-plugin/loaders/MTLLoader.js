@@ -15,7 +15,7 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	Vector2
-} from "three";
+} from "../../../build/three.module.js";
 
 var MTLLoader = function ( manager ) {
 
@@ -136,7 +136,7 @@ MTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 } );
 
 /**
- * Create a new THREE-MTLLoader.MaterialCreator
+ * Create a new MTLLoader.MaterialCreator
  * @param baseUrl - Url relative to which textures are loaded
  * @param options - Set of options on how to construct the materials
  *                  side: Which side to apply the material
@@ -543,4 +543,4 @@ MTLLoader.MaterialCreator.prototype = {
 
 };
 
-export default MTLLoader
+export { MTLLoader };

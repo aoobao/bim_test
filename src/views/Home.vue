@@ -2,17 +2,16 @@
   <div class="container">
     <container-view @render="render" @init="init" ref="view">
       <gltf-building v-if="level===1" ref="gltf" @select="selectFloor" @init="saveModel" />
+      <car-view v-if="level === 1" ref="car" />
       <floor-view v-if="level===2" ref="floor" />
     </container-view>
     <div class="button-wrapper">
       <button class="button" @click="getCameraPosition">获取照相机位置</button>
-
       <template v-if="level  === 1">
         <button class="button" @click="hideBuilding">隐藏建筑</button>
         <button class="button" @click="showBuilding">显示建筑</button>
         <button v-for="floor in floorList" :key="floor.floorName" class="button" @click="showFloor(floor)">显示楼层:{{floor.floorName}}</button>
       </template>
-
     </div>
     <right-contents />
   </div>
@@ -27,6 +26,7 @@ import GltfBuilding from '@/views/bim/GLTFBuilding'
 import floorList from '@/views/bim/floor'
 import FloorView from '@/views/bim/FloorView'
 import RightContents from '@/views/RightContents'
+import CarView from '@/views/bim/CarView'
 // import { EffectComposer } from '~plugin/postprocessing/EffectComposer'
 // import { RenderPass } from '~plugin/postprocessing/RenderPass.js'
 // import { OutlinePass } from '~plugin/postprocessing/OutlinePass.js'
@@ -34,6 +34,7 @@ export default {
   name: 'home',
   components: {
     ContainerView,
+    CarView,
     // BuildingIndex,
     GltfBuilding,
     FloorView,
@@ -49,8 +50,18 @@ export default {
     return {
       globalModel,
       level: 1,
-      floorList
+      floorList,
+      // isSave: false
     }
+  },
+  mounted () {
+
+    // setTimeout(() => {
+    //   this.$refs.car.create()
+    // }, 2000);
+
+
+
   },
   beforeDestroy () {
     if (this.$event) {
@@ -62,11 +73,17 @@ export default {
     saveModel (obj) {
       // this.$obj = obj
       this.globalModel.main = obj
+      // this.isSave = true
+      this.$nextTick(() => {
+        this.$refs.car.create()
+      })
     },
     init () {
       this.$event = getEventBus()
-      this.$event.addRightClick(this.deleteDeviceInfo)
-      this.$event.addDblRightClick(this.levelBack)
+      if (this.$event) {
+        this.$event.addRightClick(this.deleteDeviceInfo)
+        this.$event.addDblRightClick(this.levelBack)
+      }
     },
     levelBack () {
       if (this.level > 1) {

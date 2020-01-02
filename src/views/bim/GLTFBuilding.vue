@@ -1,6 +1,6 @@
 <script>
 import register from '@/components/mixins/register'
-import GLTFLoader from '@/assets/three-plugin/loaders/GLTFLoader'
+import { GLTFLoader } from '@/assets/three-plugin/loaders/GLTFLoader'
 import floorList from './floor'
 // import { getEventBus } from '@/assets/js/EventBus'
 // import DeviceView from './DeviceView'
@@ -41,7 +41,7 @@ export default {
         this.$floors = []
         this.$mesh.traverse(obj => {
           // console.log(obj)
-          if (obj.type === 'Mesh') {
+          if (obj.isMesh) {
             if (!this.$defaultMaterial) {
               this.$defaultMaterial = obj.material.clone()
             }
@@ -83,20 +83,23 @@ export default {
         gltf = this.globalModel.main
       }
       if (gltf) {
-        func(gltf)
+        func.call(this, gltf)
       } else {
         // 进度条开始
         progressJs().start()
         // setTimeout(() => {
         //   progressJs().set(30)
-        let loader = new GLTFLoader().setPath('mesh/yuanhua/')
+        // let dracoLoader = new THREE.DRACOLoader()
+        // dracoLoader.setDecoderPath('mesh/yuanhua/')
+        let loader = new GLTFLoader()
+        // loader.setDRACOLoader(dracoLoader)
+        loader.setPath('mesh/yuanhua/')
         loader.load('yuanhuabuilding.gltf', (obj) => {
-
-          func(obj)
+          func.call(this, obj)
           setTimeout(() => {
             progressJs().end()
           }, 1000)
-        }, this.loadOnProgress)
+        }, this.loadOnProgress, this.onError)
         // }, 1000);
       }
     },
@@ -124,6 +127,9 @@ export default {
           floor.material.opacity = opacity
         }
       }
+    },
+    onError (e) {
+      console.warn(e)
     },
     loadOnProgress (e) {
       // console.log(e)

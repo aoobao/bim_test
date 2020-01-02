@@ -12,6 +12,7 @@ export default {
 
     },
     // 组件销毁方法.
+    // this.$mesh 会自动销毁
     destroy () {
 
     },

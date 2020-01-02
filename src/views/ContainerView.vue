@@ -109,6 +109,10 @@ export default {
       this.height = this.global.$height = height
 
       this.global.$scene = new THREE.Scene()
+
+      this.global.$scene.background = new THREE.Color(0xa0a0a0)
+      // this.global.$scene.fog = new THREE.Fog(0xa0a0a0, 50, 400)
+
       this.global.$renderer = new THREE.WebGLRenderer({
         // precision: 'highp', // 着色器精度. 可以是 "highp", "mediump" 或者 "lowp".
         // canvas: this.$refs.container,  // 有点问题
@@ -116,7 +120,7 @@ export default {
         // alpha: true,  // canvas是否包含alpha (透明度)。
       })
 
-      this.global.$renderer.setPixelRatio(window.devicePixelRatio)
+      // this.global.$renderer.setPixelRatio(window.devicePixelRatio)
       this.global.$renderer.setSize(width, height)
 
       this.$refs.container.appendChild(this.global.$renderer.domElement)
@@ -134,12 +138,12 @@ export default {
       this._initCamera()
       // 初始化轨道控制器
       this._initOrbitControls()
-      // 初始化事件通道
+      // // 初始化事件通道
       this._initEventBus()
-      // 后处理管理器
+      // // 后处理管理器
       this._initComposer()
 
-      // 性能监测窗口
+      // // 性能监测窗口
       this._initStats()
 
       this.isRegister = true
@@ -147,6 +151,8 @@ export default {
       window.addEventListener('resize', this.resetSize, false)
 
       this.$emit('init')
+
+      this.clickTest()
     },
     _initEventBus () {
       let camera = this.getGlobalObject('camera')
@@ -220,15 +226,39 @@ export default {
         eventBus: eventBus
       })
     },
+    clickTest () {
+      let dom = this.$refs.container
+      let raycaster = this.getGlobalObject('raycaster')
+      let camera = this.getGlobalObject('camera')
+      let scene = this.getGlobalObject('scene')
+      let clickPoints = []
+      dom.addEventListener('click', (e) => {
+        let x = e.offsetX
+        let y = e.offsetY
+        let dx = (x / this.width) * 2 - 1
+        let dy = 1 - (y / this.height) * 2
+        let vec2 = new THREE.Vector2(dx, dy)
+        raycaster.setFromCamera(vec2, camera)
 
+        const intersectedObjects = raycaster.intersectObjects(scene.children, true)
+        if (intersectedObjects.length > 0) {
+          let intersected = intersectedObjects[0]
+          // console.log(intersected)
+          let point = intersected.point
+          clickPoints.push([point.x, point.y, point.z])
+          console.log(JSON.stringify(clickPoints))
+        }
+      })
+    },
     render () {
       this.$emit('render')
-
-      updateRender()
-
       const delta = this.global.$clock.getDelta()
 
-      this.global.$orbitControls.update(delta)
+      updateRender(delta)
+
+      if (this.global.$orbitControls) {
+        this.global.$orbitControls.update(delta)
+      }
 
       if (!this.global.$composer) {
         this.global.$renderer.render(this.global.$scene, this.global.$camera)
@@ -250,10 +280,12 @@ export default {
         this.global.$renderer.setSize(this.width, this.height)
         this.global.$composer.setSize(this.width, this.height)
 
-        let pixelRatio = this.global.$renderer.getPixelRatio()
+        // let pixelRatio = this.global.$renderer.getPixelRatio()
+
         let fxaaPass = this.global.$fxaaPass
-        fxaaPass.material.uniforms['resolution'].value.x = 1 / (this.width * pixelRatio);
-        fxaaPass.material.uniforms['resolution'].value.y = 1 / (this.height * pixelRatio);
+        // fxaaPass.uniforms['resolution'].value.x = 1 / (this.width * pixelRatio);
+        // fxaaPass.uniforms['resolution'].value.y = 1 / (this.height * pixelRatio);
+        fxaaPass.uniforms['resolution'].value.set(1 / this.width, 1 / this.height)
 
         // TODO
         this.$emit('resetSize')

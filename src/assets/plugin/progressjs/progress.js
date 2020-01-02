@@ -5,20 +5,20 @@
  *
  * Copyright (C) 2013 usabli.ca - Afshin Mehrabani (@afshinmeh)
  */
-
 (function (root, factory) {
 
-  if (typeof exports === 'object') {
-    // CommonJS
-    factory(exports);
-  } else if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(['exports'], factory);
-  } else {
-    // Browser globals
-    factory(root);
-  }
-}(this || window, function (exports) {
+  // if (typeof exports === 'object') {
+  //   // CommonJS
+  //   factory(exports);
+  // } else if (typeof define === 'function' && define.amd) {
+  //   // AMD. Register as an anonymous module.
+  //   define(['exports'], factory);
+  // } else {
+  //   // Browser globals
+
+  // }
+  factory(root);
+}(window, function (exports) {
   //Default config/variables
   var VERSION = '0.1.0';
 
@@ -577,7 +577,6 @@
       return this;
     }
   };
-
   exports.progressJs = progressJs;
   return progressJs;
 }));

@@ -22,6 +22,13 @@ export class EventBus {
     // this._scene = opt.scene
     this._width = this._dom.offsetWidth
     this._height = this._dom.offsetHeight
+
+    window.addEventListener('resize', () => {
+      this._width = this._dom.offsetWidth
+      this._height = this._dom.offsetHeight
+    })
+
+
     this._mouse = new THREE.Vector2()
 
     // 移入移出模型临时存储
@@ -280,12 +287,6 @@ export class EventBus {
   }
 
   _checkIntersection(eventName) {
-    // let eventObj = this._event_list[eventName]
-    // let values = Object.values(eventObj)
-    // if (values.length === 0) return
-
-    // let objects = values.map(t => t.object)
-
     let map
     if (typeof eventName === 'string') {
       map = this._event_list[eventName]

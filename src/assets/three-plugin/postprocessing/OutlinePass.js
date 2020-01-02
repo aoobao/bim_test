@@ -18,7 +18,7 @@ import {
   Vector2,
   Vector3,
   WebGLRenderTarget
-} from "three";
+} from "~plugin/three.module.js";
 import {
   Pass
 } from "../postprocessing/Pass.js";
