@@ -152,7 +152,7 @@ export default {
 
       this.$emit('init')
 
-      this.clickTest()
+      // this.clickTest()
     },
     _initEventBus () {
       let camera = this.getGlobalObject('camera')
@@ -184,7 +184,8 @@ export default {
     _initOrbitControls () {
       let camera = this.global.$camera
       // this.global.$orbitControls = new OrbitControls(camera, this.global.$renderer.domElement)
-      this.global.$orbitControls = new CameraControls(camera, this.global.$renderer.domElement)
+      // this.global.$orbitControls = new CameraControls(camera, this.global.$renderer.domElement)
+      this.global.$orbitControls = new CameraControls(camera, this.$refs.container)
       let controls = this.global.$orbitControls
       controls.enableDamping = true;
       controls.dampingFactor = 0.15;
@@ -251,20 +252,39 @@ export default {
       })
     },
     render () {
+      let timer = new Date().getTime()
+
+      window.recordTime('before render')
       this.$emit('render')
       const delta = this.global.$clock.getDelta()
 
       updateRender(delta)
 
+
+      window.recordTime('after all event and components render')
+
       if (this.global.$orbitControls) {
         this.global.$orbitControls.update(delta)
       }
+      window.recordTime('after controls render')
 
       if (!this.global.$composer) {
         this.global.$renderer.render(this.global.$scene, this.global.$camera)
       } else {
         this.global.$composer.render()
       }
+
+      let flag = window.recordTime('after render')
+
+      let tt = new Date().getTime() - timer
+      if (flag) {
+        console.log('render use time', tt)
+        if (tt < 50) {
+          console.log('over record', tt)
+          window.recordEnd()
+        }
+      }
+
 
       this.animateIndex = requestAnimationFrame(this.render)
     },

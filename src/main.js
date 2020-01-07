@@ -15,6 +15,33 @@ window.THREE = THREE
 
 Vue.config.productionTip = false
 
+let time = null
+let lastTime = null
+let isStart = false
+window.recordStart = function () {
+  isStart = true
+  lastTime = null
+  time = null
+}
+
+window.recordEnd = function () {
+  isStart = false
+}
+
+window.recordTime = function (msg) {
+  if (!isStart) return false
+  let timer = new Date().getTime()
+  if (time === null) {
+    time = timer
+    console.log('start', time)
+  } else {
+    console.log(msg, timer - lastTime, timer - time)
+  }
+  lastTime = timer
+  return true
+
+}
+
 new Vue({
   router,
   store,

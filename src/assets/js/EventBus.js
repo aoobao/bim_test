@@ -172,7 +172,7 @@ export class EventBus {
         activeObject = intersects[0].object
       }
       if (activeObject !== this._active_move_object) {
-        typeof this._move_change_fun === 'function' && this._move_change_fun(activeObject, this._active_move_object)
+        typeof this._move_change_fun === 'function' && this._move_change_fun(activeObject, this._active_move_object, e)
         this._active_move_object = activeObject
       }
     }

@@ -24,15 +24,20 @@ export class SelectManager {
     this._composer.addPass(this._outlinePass)
   }
 
+  // 初始化選擇器控制
   init({
     objects,
     click,
-    dblclick
+    dblclick,
+    moveIn,
+    moveOut
   }) {
     this.clear()
     this.objects = objects
     this._click = click
     this._dblclick = dblclick
+    this._moveIn = moveIn
+    this._moveOut = moveOut
 
     // 鼠标移入事件
     this._eventBus.change(objects, this._moveEnter)
@@ -52,16 +57,20 @@ export class SelectManager {
     typeof this._dblclick === 'function' && this._dblclick(floor)
   }
 
-  _moveEnter(object) {
+  _moveEnter(object, old, event) {
     if (object) {
       this._outlinePass.selectedObjects = [object]
+      // 移入
+      typeof this._moveIn === 'function' && this._moveIn(object, event)
     } else {
-      this._outlinePass.selectedObjects = []
+      this.clearSelect()
+      typeof this._moveOut === 'function' && this._moveOut(old, event)
     }
   }
 
   clearSelect() {
     this._outlinePass.selectedObjects = []
+    // 移出事件
   }
 
   clear() {
@@ -76,6 +85,8 @@ export class SelectManager {
     this.objects = null
     this._click = null
     this._dblclick = null
+    this._moveIn = null
+    this._moveOut = null
 
   }
   destroy() {

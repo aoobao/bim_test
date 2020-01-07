@@ -61,7 +61,7 @@ export default class CameraControls extends EventDispatcher {
 
 	constructor( camera, domElement, options = {} ) {
 
-		super();
+    super();
 
 		this._camera = camera;
 		this._yAxisUpSpace = new THREE.Quaternion().setFromUnitVectors( this._camera.up, _AXIS_Y );
@@ -255,8 +255,7 @@ export default class CameraControls extends EventDispatcher {
 			}
 
 			function onMouseWheel( event ) {
-
-				if ( ! scope.enabled ) return;
+        if ( ! scope.enabled ) return;
 
 				event.preventDefault();
 
@@ -306,7 +305,9 @@ export default class CameraControls extends EventDispatcher {
 
 			function onContextMenu( event ) {
 
-				if ( ! scope.enabled ) return;
+        if ( ! scope.enabled ) return;
+
+        console.log('右键')
 
 				event.preventDefault();
 

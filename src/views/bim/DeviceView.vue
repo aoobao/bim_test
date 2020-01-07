@@ -53,7 +53,6 @@ export default {
 
     clear () {
       if (this.floor && this.floor.children.length > 0) {
-        debugger
         this.floor.remove(...this.floor.children)
       }
     },

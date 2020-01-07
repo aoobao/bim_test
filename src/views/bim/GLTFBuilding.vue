@@ -2,17 +2,29 @@
 import register from '@/components/mixins/register'
 import { GLTFLoader } from '@/assets/three-plugin/loaders/GLTFLoader'
 import floorList from './floor'
+import TitleView from './TitleView'
 // import { getEventBus } from '@/assets/js/EventBus'
-// import DeviceView from './DeviceView'
 export default {
+  components: { TitleView },
   mixins: [register],
   data () {
     return {
-      warnFloor: []
+      warnFloor: [],
+      selectFloor: null
     }
   },
+  computed: {
+    selectFloorName () {
+      if (this.selectFloor) {
+        return this.selectFloor.floorName
+      }
+      return null
+    }
+  },
+  render () {
+    return <title-view title={this.selectFloorName} />
+  },
   methods: {
-
     getWarnFloorList () {
       let list = []
       for (let i = 0; i < floorList.length; i++) {
@@ -30,11 +42,22 @@ export default {
       }, 5000);
     },
 
+    selectMoveIn (obj) {
+      let name = obj.userData.name
+      // console.log(name)
+      let floorItem = floorList.find(t => t.meshName === name)
+      if (floorItem) {
+        this.selectFloor = floorItem
+      }
+    },
+    selectMoveOut () {
+      this.selectFloor = null
+    },
     // 组件初始化方法
     init () {
-
-
       let func = gltf => {
+        window.recordStart()
+        window.recordTime('init')
         let mesh = gltf.scene
         this.$mesh = mesh
 
@@ -57,16 +80,22 @@ export default {
           }
         })
 
+        window.recordTime('mesh traverse')
         // 楼层选择管理
         let selectManager = this.global.$selectManager
         selectManager.init({
           objects: this.$floors,
-          dblclick: this.floorDblClick
+          dblclick: this.floorDblClick,
+          click: this.floorClick,
+          moveIn: this.selectMoveIn,
+          moveOut: this.selectMoveOut
         })
 
+        window.recordTime('selectmanager')
         // eventBus.on(this.$floors, 'dblclick', this.floorClick)
-
         this.$addObject(this.$mesh)
+
+        // this.global.$scene.add(mesh)
 
         // 还原初始位置
         let controls = this.getGlobalObject('orbitControls')
@@ -74,9 +103,12 @@ export default {
 
         // 模拟报警楼层.
         this.getWarnFloorList()
-
+        window.recordTime('init over')
 
         this.$emit('init', gltf)
+        window.recordTime('init emit over')
+
+
       }
       let gltf = null
       if (this.globalModel) {
@@ -157,13 +189,23 @@ export default {
       return floor
     },
 
+    floorClick (floor) {
+      let name = floor.userData.name
+      let floorItem = floorList.find(t => t.meshName === name)
+      if (floorItem) {
+        this.$emit('click', floorItem)
+      } else {
+        // 不应该不存在 error
+        // debugger
+      }
+    },
     floorDblClick (floor) {
       let name = floor.userData.name
       let floorItem = floorList.find(t => t.meshName === name)
       if (floorItem) {
         // alert('你点击了' + floorItem.floorName)
         // console.log('双击事件:' + floorItem.floorName)
-        this.$emit('select', floorItem)
+        this.$emit('dblClick', floorItem)
       } else {
         // 不应该不存在 error
         // debugger
@@ -265,6 +307,8 @@ export default {
       this.destroyMaterial()
       let selectManager = this.global.$selectManager
       selectManager.clear()
+
+      window.recordEnd()
     }
   },
   watch: {

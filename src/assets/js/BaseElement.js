@@ -62,9 +62,21 @@ export class BaseElement {
     div.className = '__base_element_body'
 
     div.style.display = 'none'
+
+    // div.addEventListener('contextmenu', this._onContextMenu)
+    // div.addEventListener('wheel', e => {
+    //   // console.log(e)
+    //   console.log('element wheel')
+    //   // e.preventDefault();
+    // })
+
     elementBody.appendChild(div)
     this.__el = div
   }
+
+  // _onContextMenu(e) {
+  //   e.preventDefault()
+  // }
 
   __updateElement(element) {
     element.style.position = 'absolute'

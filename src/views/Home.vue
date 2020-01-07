@@ -1,25 +1,24 @@
 <template>
   <div class="container">
     <container-view @render="render" @init="init" ref="view">
-      <gltf-building v-if="level===1" ref="gltf" @select="selectFloor" @init="saveModel" />
+      <gltf-building v-if="level===1" ref="gltf" @click="getFloorInfo" @dblClick="selectFloor" @init="saveModel" />
       <car-view v-if="level === 1" ref="car" />
       <floor-view v-if="level===2" ref="floor" />
     </container-view>
     <div class="button-wrapper">
-      <button class="button" @click="getCameraPosition">获取照相机位置</button>
-      <template v-if="level  === 1">
+      <button class="button" @click="getCameraPosition">输出照相机位置</button>
+      <!-- <template v-if="level  === 1">
         <button class="button" @click="hideBuilding">隐藏建筑</button>
         <button class="button" @click="showBuilding">显示建筑</button>
         <button v-for="floor in floorList" :key="floor.floorName" class="button" @click="showFloor(floor)">显示楼层:{{floor.floorName}}</button>
-      </template>
+      </template> -->
     </div>
     <right-contents />
   </div>
 </template>
 
 <script>
-// import BuildingIndex from '@/views/bim/BuildingIndex'
-// import EventControl from '@/components/EventControl'
+
 import { getEventBus } from '@/assets/js/EventBus'
 import ContainerView from '@/views/ContainerView'
 import GltfBuilding from '@/views/bim/GLTFBuilding'
@@ -27,15 +26,11 @@ import floorList from '@/views/bim/floor'
 import FloorView from '@/views/bim/FloorView'
 import RightContents from '@/views/RightContents'
 import CarView from '@/views/bim/CarView'
-// import { EffectComposer } from '~plugin/postprocessing/EffectComposer'
-// import { RenderPass } from '~plugin/postprocessing/RenderPass.js'
-// import { OutlinePass } from '~plugin/postprocessing/OutlinePass.js'
 export default {
   name: 'home',
   components: {
     ContainerView,
     CarView,
-    // BuildingIndex,
     GltfBuilding,
     FloorView,
     RightContents
@@ -55,13 +50,9 @@ export default {
     }
   },
   mounted () {
-
     // setTimeout(() => {
     //   this.$refs.car.create()
     // }, 2000);
-
-
-
   },
   beforeDestroy () {
     if (this.$event) {
@@ -71,12 +62,22 @@ export default {
   },
   methods: {
     saveModel (obj) {
-      // this.$obj = obj
+
+      // window.recordTime('save begin')
       this.globalModel.main = obj
-      // this.isSave = true
+
+      // window.recordTime('save end')
       this.$nextTick(() => {
-        this.$refs.car.create()
+        if (this.$refs.car) this.$refs.car.create()
       })
+
+      // setTimeout(() => {
+      //   let o = obj
+      //   console.log(o)
+      //   debugger
+      // }, 2000);
+
+      // window.recordTime('save function end')
     },
     init () {
       this.$event = getEventBus()
@@ -91,7 +92,11 @@ export default {
       }
     },
     deleteDeviceInfo () {
-      this.$store.commit('setDeviceInfo', null)
+      this.$store.commit('clearInfo')
+    },
+    getFloorInfo (floor) {
+      // console.log(floor)
+      this.$store.commit('setFloorInfo', floor)
     },
     selectFloor (floor) {
       // console.log(floor)
@@ -99,10 +104,9 @@ export default {
       if (obj) {
         this.level = 2
         this.$nextTick(() => {
-          this.$refs.floor.create(obj)
+          if (this.$refs.floor) this.$refs.floor.create(obj)
         })
       }
-
     },
     render () {
       // let composer = this.$refs.index.getGlobalObject('composer')
@@ -127,6 +131,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+
 .container {
   width: 100%;
   height: 100vh;
