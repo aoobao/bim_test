@@ -252,21 +252,21 @@ export default {
       })
     },
     render () {
-      let timer = new Date().getTime()
+      // let timer = new Date().getTime()
 
-      window.recordTime('before render')
+      // window.recordTime('before render')
       this.$emit('render')
       const delta = this.global.$clock.getDelta()
 
       updateRender(delta)
 
 
-      window.recordTime('after all event and components render')
+      // window.recordTime('after all event and components render')
 
       if (this.global.$orbitControls) {
         this.global.$orbitControls.update(delta)
       }
-      window.recordTime('after controls render')
+      // window.recordTime('after controls render')
 
       if (!this.global.$composer) {
         this.global.$renderer.render(this.global.$scene, this.global.$camera)
@@ -274,16 +274,16 @@ export default {
         this.global.$composer.render()
       }
 
-      let flag = window.recordTime('after render')
+      // let flag = window.recordTime('after render')
 
-      let tt = new Date().getTime() - timer
-      if (flag) {
-        console.log('render use time', tt)
-        if (tt < 50) {
-          console.log('over record', tt)
-          window.recordEnd()
-        }
-      }
+      // let tt = new Date().getTime() - timer
+      // if (flag) {
+      //   console.log('render use time', tt)
+      //   if (tt < 50) {
+      //     console.log('over record', tt)
+      //     window.recordEnd()
+      //   }
+      // }
 
 
       this.animateIndex = requestAnimationFrame(this.render)

@@ -56,8 +56,8 @@ export default {
     // 组件初始化方法
     init () {
       let func = gltf => {
-        window.recordStart()
-        window.recordTime('init')
+        // window.recordStart()
+        // window.recordTime('init')
         let mesh = gltf.scene
         this.$mesh = mesh
 
@@ -80,7 +80,7 @@ export default {
           }
         })
 
-        window.recordTime('mesh traverse')
+        // window.recordTime('mesh traverse')
         // 楼层选择管理
         let selectManager = this.global.$selectManager
         selectManager.init({
@@ -91,7 +91,7 @@ export default {
           moveOut: this.selectMoveOut
         })
 
-        window.recordTime('selectmanager')
+        // window.recordTime('selectmanager')
         // eventBus.on(this.$floors, 'dblclick', this.floorClick)
         this.$addObject(this.$mesh)
 
@@ -103,10 +103,10 @@ export default {
 
         // 模拟报警楼层.
         this.getWarnFloorList()
-        window.recordTime('init over')
+        // window.recordTime('init over')
 
         this.$emit('init', gltf)
-        window.recordTime('init emit over')
+        // window.recordTime('init emit over')
 
 
       }

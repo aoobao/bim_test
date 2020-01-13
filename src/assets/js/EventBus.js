@@ -15,7 +15,7 @@ export class EventBus {
     this._initialize(opt)
   }
 
-  _initialize(opt) {
+  _initialize (opt) {
     this._dom = opt.dom
     this._camera = opt.camera
     this._raycaster = opt.raycaster
@@ -53,6 +53,7 @@ export class EventBus {
       // moveover: new Map()
     }
 
+    this._mouse_left_down = [0, 0]
     this._mouse_down = [0, 0]
 
     this._event_back = [] // 用来存储鼠标右键没有命中任何目标时的事件
@@ -66,7 +67,7 @@ export class EventBus {
     this._move_change_fun = null
 
     // this._raycaster = new THREE.Raycaster()
-    this._dom.addEventListener('click', this._clickHandle, false)
+    // this._dom.addEventListener('click', this._clickHandle, false)
     this._dom.addEventListener('dblclick', this._dblclickHandle, false)
     // this._dom.addEventListener('contextmenu', this._onContextMenu)
     this._dom.addEventListener('mousemove', this._moveinHandle, false)
@@ -75,7 +76,7 @@ export class EventBus {
     this._dom.addEventListener('mouseup', this._onMouseUp, false)
   }
 
-  _onMouseDown(e) {
+  _onMouseDown (e) {
     // console.log(e)
     let button = e.button
     // 对右键进行处理
@@ -83,11 +84,17 @@ export class EventBus {
       let x = e.offsetX
       let y = e.offsetY
       this._mouse_down = [x, y]
+    } else if (button === 0) {
+      let x = e.offsetX
+      let y = e.offsetY
+      // let time = new Date().getTime()
+      this._mouse_left_down = [x, y]
     }
   }
 
-  _onMouseUp(e) {
+  _onMouseUp (e) {
     let button = e.button
+    // console.log(e)
     if (button === 2) {
       // debugger
       let x = e.offsetX
@@ -99,11 +106,19 @@ export class EventBus {
       } else {
         // 右键拖拽事件,直接抛弃
       }
+    } else if (button === 0) {
+
+      let x = e.offsetX
+      let y = e.offsetY
+      let distance = Math.pow((x * x - Math.pow(this._mouse_left_down[0], 2)) + (y * y - Math.pow(this._mouse_left_down[1], 2)), 0.5)
+      if (distance < DISTANCE) {
+        this._clickHandle(e)
+      }
     }
   }
 
 
-  _onContextMenu(e) {
+  _onContextMenu (e) {
     // e.preventDefault()
     // console.log('contextMenu', e)
     let flag = this._mouseChangeHandle(e, 'right_click')
@@ -129,14 +144,14 @@ export class EventBus {
     }
   }
 
-  _onDblRightClick(e) {
+  _onDblRightClick (e) {
     for (let i = 0; i < this._event_dblclick.length; i++) {
       const func = this._event_dblclick[i]
       func(e)
     }
   }
 
-  _clickHandle(e) {
+  _clickHandle (e) {
 
     if (e.detail == 1) {
 
@@ -152,7 +167,7 @@ export class EventBus {
     // console.log('click', e, e.detail)
   }
 
-  _dblclickHandle(e) {
+  _dblclickHandle (e) {
     // console.log('dblclick', e, e.detail)
     if (this._clickIndex) {
       clearTimeout(this._clickIndex)
@@ -162,7 +177,7 @@ export class EventBus {
   }
 
   // 移入移出事件
-  _moveinHandle(e) {
+  _moveinHandle (e) {
     // console.log(e)
     this._updateMousePosition(e)
     if (this._move_change_list && this._move_change_list.size > 0) {
@@ -247,7 +262,7 @@ export class EventBus {
 
 
 
-  _updateMousePosition(e) {
+  _updateMousePosition (e) {
     let x = e.offsetX
     let y = e.offsetY
     let dx = (x / this._width) * 2 - 1
@@ -257,13 +272,13 @@ export class EventBus {
   }
 
 
-  _mouseChangeHandle(e, eventName) {
+  _mouseChangeHandle (e, eventName) {
     this._updateMousePosition(e)
 
     return this._runIntersection(eventName)
   }
 
-  _runIntersection(eventName) {
+  _runIntersection (eventName) {
     let flag = false // 是否存在被执行的方法
     let map = this._event_list[eventName]
     let intersects = this._checkIntersection(eventName)
@@ -286,7 +301,7 @@ export class EventBus {
     return flag
   }
 
-  _checkIntersection(eventName) {
+  _checkIntersection (eventName) {
     let map
     if (typeof eventName === 'string') {
       map = this._event_list[eventName]
@@ -309,7 +324,7 @@ export class EventBus {
     return intersects
   }
 
-  change(objects, func) {
+  change (objects, func) {
     if (objects) {
       this._move_change_list = new Set(objects)
       this._active_move_object = null
@@ -322,11 +337,11 @@ export class EventBus {
 
   }
 
-  addRightClick(func) {
+  addRightClick (func) {
     this._event_back.push(func)
   }
 
-  removeRightClick(func) {
+  removeRightClick (func) {
     for (let i = this._event_back.length - 1; i >= 0; i--) {
       const fun = this._event_back[i];
       if (fun === func) {
@@ -335,11 +350,11 @@ export class EventBus {
     }
   }
 
-  addDblRightClick(func) {
+  addDblRightClick (func) {
     this._event_dblclick.push(func)
   }
 
-  removeDblRightClick(func) {
+  removeDblRightClick (func) {
     for (let i = this._event_dblclick.length - 1; i >= 0; i--) {
       const fun = this._event_dblclick[i];
       if (fun === func) {
@@ -350,7 +365,7 @@ export class EventBus {
 
 
 
-  on(object, eventName, func) {
+  on (object, eventName, func) {
     if (Array.isArray(object)) {
       object.forEach(o => {
         this.on(o, eventName, func)
@@ -373,7 +388,7 @@ export class EventBus {
 
   }
 
-  off(object, eventName, func) {
+  off (object, eventName, func) {
     if (Array.isArray(object)) {
       object.forEach(o => {
         this.off(o, eventName, func)
@@ -399,7 +414,7 @@ export class EventBus {
     }
   }
 
-  removeAll(eventName = null, object = null) {
+  removeAll (eventName = null, object = null) {
     let eventNames = Object.keys(this._event_list)
     for (let i = 0; i < eventNames.length; i++) {
       const name = eventNames[i]
@@ -414,7 +429,7 @@ export class EventBus {
     }
   }
 
-  destroy() {
+  destroy () {
     this.removeAll()
     this._dom.removeEventListener('click', this._clickHandle, false)
     this._dom.removeEventListener('dblclick', this._dblclickHandle, false)
@@ -428,7 +443,7 @@ export class EventBus {
 
 let eventBus = null
 
-export function createEventBus(opt) {
+export function createEventBus (opt) {
   if (eventBus) {
     eventBus.destroy()
   }
@@ -436,6 +451,6 @@ export function createEventBus(opt) {
   return eventBus
 }
 
-export function getEventBus() {
+export function getEventBus () {
   return eventBus
 }
